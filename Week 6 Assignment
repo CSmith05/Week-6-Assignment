@@ -1,0 +1,82 @@
+from pathlib import Path
+
+## This function reads the file and returns its data as a set of arrays
+def drawInfo(path):
+    ## Open the file and draw each line to the output array
+    with open(path, "r") as file:
+        output=[]
+        for line in file:
+            output.append(line.replace('\n','').split(','))
+        ## Once every value has been placed in the output, return it for processing
+        return output
+
+## Convert the list of arrays from the DrawInfo function into a dictionary
+def dictionarify(data):
+    dictoutput=[]
+    ## Uses the first values in the file as the column names
+    columns=data[0]
+    ## For each row, convert the data into a 3-set dictionary and append it to the output array
+    for row in data[1:]:
+        dictoutput.append({
+            columns[0]:row[0],
+            columns[1]:row[1],
+            columns[2]:row[2]
+        })
+    return dictoutput
+
+## Read through the data and print the requested values
+def parseInfo(data):
+    ## Arrays
+    totalSales=0
+    topThree={
+        'North America':0,
+        'Europe':0,
+        'Asia':0
+    }
+    sorted=[]
+    topListOutput=[]
+    bwRevenue={
+        'bobbles':0,
+        'widgets':0
+    }
+    biggestLoser=''
+
+    ## Logic
+    for row in data:
+        ## Add up the sales totals
+        totalSales+=int(row['sales'])
+        topThree[str(row['region'])]+=int(row['sales'])
+        bwRevenue[str(row['product'])]+=int(row['sales'])
+    print(f'Total Sales: {totalSales} units')
+
+    ## Sorts the three regions by total product sold
+    for value in topThree.values():
+        sorted.append(value)
+    sorted.sort()
+    for number in sorted:
+        for index,value in enumerate(topThree.values()):
+            if value==number:
+                topListOutput.append(('North America','Europe','Asia')[index])
+    topListOutput.insert(1,str(f'({sorted[0]}$),'))
+    topListOutput.insert(3,str(f'({sorted[1]}$),'))
+    topListOutput.append(str(f'({sorted[2]}$)'))
+    print(f'From lowest to highest profits: {' '.join(topListOutput)}')
+
+    ## Determine which product sold more and print the findings
+    if bwRevenue['bobbles'] > bwRevenue['widgets']:
+        biggestLoser='widgets'
+        print(f'Bobbles sold more units with {bwRevenue['bobbles']}\nWidgets sold fewer units with {bwRevenue['widgets']}')
+    else:
+        biggestLoser='bobbles'
+        print(f'Widgets sold more units with {bwRevenue['widgets']}\nBobbles sold fewer units with {bwRevenue['bobbles']}')
+
+    ## Assume bobbles cost $10.99 per unit and widgets cost $15.99 per unit, then calculate which made more total revenue
+    if bwRevenue['bobbles']*10.99 > bwRevenue['widgets']*15.99:
+        print(f'Bobbles sold for more revenue with {bwRevenue['bobbles']*10.99}$\nWidgets sold for less revenue with {bwRevenue['widgets']*15.99}$')
+    else:
+        print(f'Widgets sold for more revenue with {bwRevenue['widgets']*15.99}$\nBobbles sold for less revenue with {bwRevenue['bobbles']*10.99}$')
+
+    print(f'Least profitable region: {topListOutput[0]}\nLeast sold product: {biggestLoser}')
+
+
+parseInfo(dictionarify(drawInfo(r"C:\Users\dudeguypal\Downloads\sales_data.csv")))
