@@ -78,5 +78,8 @@ def parseInfo(data):
 
     print(f'Least profitable region: {topListOutput[0]}\nLeast sold product: {biggestLoser}')
 
-
-parseInfo(dictionarify(drawInfo(r"C:\Users\dudeguypal\Downloads\sales_data.csv")))
+## ADD FILE PATH HERE
+try:
+    parseInfo(dictionarify(drawInfo(r"")))
+except Exception as e:
+    print('Please input the path to your csv file')
